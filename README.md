@@ -4,7 +4,7 @@ Griddler::Sendgrid
 This is an adapter that allows [Griddler](/thoughtbot/griddler) to be used with
 [SendGrid's Parse API].
 
-[SendGrid's Parse API](http://sendgrid.com/docs/API%20Reference/Webhooks/parse.html)
+[SendGrid's Parse API]: http://sendgrid.com/docs/API%20Reference/Webhooks/parse.html
 
 Installation
 ------------
