@@ -1,7 +1,14 @@
 require 'spec_helper'
 
 describe Griddler::Sendgrid::Adapter, '.normalize_params' do
-  include Griddler::FixturesHelper
+  it_should_behave_like 'Griddler adapter',
+    :sendgrid,
+    {
+      text: 'hi',
+      to: 'Hello World <hi@example.com>',
+      cc: 'emily@example.com',
+      from: 'There <there@example.com>',
+    }
 
   it 'changes attachments to an array of files' do
     params = default_params.merge(
@@ -57,10 +64,6 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:cc].should eq []
   end
 
-  def normalize_params(params)
-    Griddler::Sendgrid::Adapter.normalize_params(params)
-  end
-
   def default_params
     {
       text: 'hi',
@@ -68,21 +71,5 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       cc: 'cc@example.com',
       from: 'there@example.com',
     }
-  end
-
-  def upload_1
-    @upload_1 ||= ActionDispatch::Http::UploadedFile.new({
-      filename: 'photo1.jpg',
-      type: 'image/jpeg',
-      tempfile: fixture_file('photo1.jpg')
-    })
-  end
-
-  def upload_2
-    @upload_2 ||= ActionDispatch::Http::UploadedFile.new({
-      filename: 'photo2.jpg',
-      type: 'image/jpeg',
-      tempfile: fixture_file('photo2.jpg')
-    })
   end
 end
