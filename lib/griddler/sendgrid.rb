@@ -1,7 +1,8 @@
-require "griddler/sendgrid/version"
+require 'griddler'
+require 'griddler/sendgrid/version'
+require 'griddler/sendgrid/adapter'
 
 module Griddler
   module Sendgrid
-    # Your code goes here...
   end
 end
