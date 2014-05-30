@@ -1,5 +1,11 @@
 require 'spec_helper'
 
+describe Griddler::Sendgrid::Adapter do
+  it 'registers itself with griddler' do
+    Griddler.adapter_registry[:sendgrid].should eq Griddler::Sendgrid::Adapter
+  end
+end
+
 describe Griddler::Sendgrid::Adapter, '.normalize_params' do
   it_should_behave_like 'Griddler adapter',
     :sendgrid,

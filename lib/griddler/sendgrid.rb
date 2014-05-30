@@ -6,3 +6,5 @@ module Griddler
   module Sendgrid
   end
 end
+
+Griddler.adapter_registry.register(:sendgrid, Griddler::Sendgrid::Adapter)
