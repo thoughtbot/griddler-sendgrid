@@ -14,6 +14,7 @@ module Griddler
         params.merge(
           to: recipients(:to),
           cc: recipients(:cc),
+          bcc: get_bcc,
           attachments: attachment_files,
         )
       end
@@ -24,6 +25,33 @@ module Griddler
 
       def recipients(key)
         ( params[key] || '' ).split(',')
+      end
+
+      def get_bcc
+        return [] unless params[:envelope].present?
+        envelope = json_to_hash(params[:envelope])
+        bcc = if envelope.present?
+                envelope["to"]
+              else
+                []
+              end
+        remove_addresses_from_bcc(remove_addresses_from_bcc(bcc, params[:to]),
+                                  params[:cc])
+      end
+
+      def remove_addresses_from_bcc(bcc, addresses)
+        return bcc unless addresses.present?
+        if addresses.is_a?(Array)
+          bcc -= addresses
+        else
+          bcc.delete(addresses) if bcc.present?
+        end
+        bcc
+      end
+
+      def json_to_hash(json_str)
+        return [] unless json_str.present?
+        JSON.parse(json_str || '')
       end
 
       def attachment_files
