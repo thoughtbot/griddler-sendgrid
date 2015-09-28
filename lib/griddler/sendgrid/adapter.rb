@@ -12,7 +12,7 @@ module Griddler
 
       def normalize_params
         params.merge(
-          to: recipients(:to),
+          to: recipients(:to) + envelope["to"].to_a,
           cc: recipients(:cc),
           attachments: attachment_files,
         )
@@ -21,6 +21,10 @@ module Griddler
       private
 
       attr_reader :params
+
+      def envelope
+        @envelope ||= JSON.parse(params[:envelope] || '{}')
+      end
 
       def recipients(key)
         ( params[key] || '' ).split(',')
