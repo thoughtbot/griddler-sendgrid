@@ -70,12 +70,33 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:cc].should eq []
   end
 
+  it 'wraps bcc in an array' do
+    normalized_params = normalize_params(default_params)
+
+    normalized_params[:bcc].should eq ["johny@example.com"]
+  end
+
+  it 'returns an array even if bcc is empty' do
+    params = default_params.merge(envelope: nil)
+    normalized_params = normalize_params(params)
+
+    normalized_params[:bcc].should eq []
+  end
+
+  it 'returns an empty array when the envelope to is the same as the base to' do
+    params = default_params.merge(envelope: "{\"to\":[\"hi@example.com\"]}")
+    normalized_params = normalize_params(params)
+
+    normalized_params[:bcc].should eq []
+  end
+
   def default_params
     {
       text: 'hi',
       to: 'hi@example.com',
       cc: 'cc@example.com',
       from: 'there@example.com',
+      envelope: "{\"to\":[\"johny@example.com\"], \"from\": [\"there@example.com\"]}",
     }
   end
 end
