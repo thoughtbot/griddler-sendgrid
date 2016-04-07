@@ -48,7 +48,7 @@ module Griddler
       end
 
       def bcc_from_envelope(envelope)
-        JSON.parse(envelope)["to"] if envelope
+        JSON.parse(envelope)["to"] if envelope.present?
       end
 
       def attachment_files
