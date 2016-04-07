@@ -28,30 +28,27 @@ module Griddler
       end
 
       def get_bcc
-        return [] unless params[:envelope].present?
-        envelope = json_to_hash(params[:envelope])
-        bcc = if envelope.present?
-                envelope["to"]
-              else
-                []
-              end
-        remove_addresses_from_bcc(remove_addresses_from_bcc(bcc, params[:to]),
-                                  params[:cc])
+        if bcc = bcc_from_envelope(params[:envelope])
+          remove_addresses_from_bcc(
+            remove_addresses_from_bcc(bcc, params[:to]),
+            params[:cc]
+          )
+        else
+          []
+        end
       end
 
       def remove_addresses_from_bcc(bcc, addresses)
-        return bcc unless addresses.present?
         if addresses.is_a?(Array)
           bcc -= addresses
-        else
-          bcc.delete(addresses) if bcc.present?
+        elsif addresses && bcc
+          bcc.delete(addresses)
         end
         bcc
       end
 
-      def json_to_hash(json_str)
-        return [] unless json_str.present?
-        JSON.parse(json_str || '')
+      def bcc_from_envelope(envelope)
+        JSON.parse(envelope)["to"] if envelope
       end
 
       def attachment_files
