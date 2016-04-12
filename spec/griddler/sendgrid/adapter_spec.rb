@@ -70,6 +70,13 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:cc].should eq []
   end
 
+  it 'returns an array even if bcc is an empty string' do
+    params = default_params.merge(envelope: '')
+    normalized_params = normalize_params(params)
+
+    normalized_params[:bcc].should eq []
+  end
+
   it 'wraps bcc in an array' do
     normalized_params = normalize_params(default_params)
 
