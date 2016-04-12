@@ -24,7 +24,16 @@ module Griddler
       attr_reader :params
 
       def recipients(key)
-        ( params[key] || '' ).split(',')
+        raw = ( params[key] || '' )
+        if raw.index(">")
+          raw.split(">,").map do |addr|
+            addr.strip!
+            addr << ">" unless addr.index(">")
+            addr
+          end
+        else
+          raw.split(',')
+        end
       end
 
       def get_bcc

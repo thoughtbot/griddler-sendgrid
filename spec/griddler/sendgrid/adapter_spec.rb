@@ -51,10 +51,10 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:attachments].should be_empty
   end
 
-  it 'wraps to in an array' do
+  it 'splits to into an array' do
     normalized_params = normalize_params(default_params)
 
-    normalized_params[:to].should eq [default_params[:to]]
+    normalized_params[:to].should eq ['"Mr Fugushima at Fugu, Inc" <hi@example.com>', 'Foo bar <foo@example.com>']
   end
 
   it 'wraps cc in an array' do
@@ -100,7 +100,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
   def default_params
     {
       text: 'hi',
-      to: 'hi@example.com',
+      to: '"Mr Fugushima at Fugu, Inc" <hi@example.com>, Foo bar <foo@example.com>',
       cc: 'cc@example.com',
       from: 'there@example.com',
       envelope: "{\"to\":[\"johny@example.com\"], \"from\": [\"there@example.com\"]}",
