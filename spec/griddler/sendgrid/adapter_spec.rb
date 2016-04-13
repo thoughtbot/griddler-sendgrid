@@ -97,6 +97,26 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:bcc].should eq []
   end
 
+  it 'extracts text from html when text param is blank' do
+    params = default_params.merge text: nil, html: <<-EOF
+<style type="text/css">
+  .my-sweet-class { color: red; }
+</style>
+<div>
+  <p>Yo,</p>
+  <p>Sup?</p>
+  <br />
+</div>
+<div>
+  <p>Yours truly,</p>
+  <p>Joe</p>
+</div>
+    EOF
+
+    email = Griddler::Email.new(normalize_params params)
+    email.body.should eq("Yo,\n  Sup?\n  \n\n\n  Yours truly,\n  Joe")
+  end
+
   def default_params
     {
       text: 'hi',
