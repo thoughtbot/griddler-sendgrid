@@ -24,6 +24,7 @@ Usage
   on integrating Griddler with your application.
 * And of course, view our own blog post on the subject over at [Giant
   Robots](http://robots.thoughtbot.com/handle-incoming-email-with-griddler).
+* *Note:* Make sure to uncheck the "Spam Check" and "Send Raw" checkboxes on the [Parse Webhook settings page](http://sendgrid.com/developer/reply), otherwise the returned parsed email will have the body stripped out.
 
 More Information
 ----------------
