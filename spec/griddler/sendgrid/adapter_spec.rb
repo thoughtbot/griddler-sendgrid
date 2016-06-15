@@ -23,15 +23,15 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       attachment2: upload_2,
      'attachment-info' => <<-eojson
         {
-          'attachment2': {
-            'filename': 'photo2.jpg',
-            'name': 'photo2.jpg',
-            'type': 'image/jpeg'
+          "attachment2": {
+            "filename": "photo2.jpg",
+            "name": "photo2.jpg",
+            "type": "image/jpeg"
           },
-          'attachment1': {
-            'filename': 'photo1.jpg',
-            'name': 'photo1.jpg',
-            'type': 'image/jpeg'
+          "attachment1": {
+            "filename": "photo1.jpg",
+            "name": "photo1.jpg",
+            "type": "image/jpeg"
           }
         }
       eojson
@@ -42,6 +42,33 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params.should_not have_key(:attachment1)
     normalized_params.should_not have_key(:attachment2)
     normalized_params.should_not have_key(:attachment_info)
+  end
+
+  it "uses sendgrid attachment info for filename" do
+    params = default_params.merge(
+      attachments: "2",
+      attachment1: upload_1,
+      attachment2: upload_2,
+      "attachment-info" => <<-eojson
+        {
+          "attachment2": {
+            "filename": "sendgrid-filename2.jpg",
+            "name": "photo2.jpg",
+            "type": "image/jpeg"
+          },
+          "attachment1": {
+            "filename": "sendgrid-filename1.jpg",
+            "name": "photo1.jpg",
+            "type": "image/jpeg"
+          }
+        }
+      eojson
+    )
+
+    attachments = normalize_params(params)[:attachments]
+
+    attachments.first.original_filename.should eq "sendgrid-filename1.jpg"
+    attachments.second.original_filename.should eq "sendgrid-filename2.jpg"
   end
 
   it 'has no attachments' do

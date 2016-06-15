@@ -69,12 +69,31 @@ module Griddler
       end
 
       def attachment_files
-        params.delete('attachment-info')
-        attachment_count = params[:attachments].to_i
-
         attachment_count.times.map do |index|
-          params.delete("attachment#{index + 1}".to_sym)
+          extract_file_at(index)
         end
+      end
+
+      def attachment_count
+        params[:attachments].to_i
+      end
+
+      def extract_file_at(index)
+        filename = attachment_filename(index)
+
+        params.delete("attachment#{index + 1}".to_sym).tap do |file|
+          if filename.present?
+            file.original_filename = filename
+          end
+        end
+      end
+
+      def attachment_filename(index)
+        attachment_info.fetch("attachment#{index + 1}", {})["filename"]
+      end
+
+      def attachment_info
+        @attachment_info ||= JSON.parse(params.delete("attachment-info") || "{}")
       end
     end
   end
