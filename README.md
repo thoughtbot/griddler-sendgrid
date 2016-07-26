@@ -20,7 +20,7 @@ Usage
 -----
 
 * SendGrid has done a [great
-  tutorial](http://blog.sendgrid.com/receiving-email-in-your-rails-app-with-griddler/)
+  tutorial](https://sendgrid.com/blog/receiving-email-in-your-rails-app-with-griddler/)
   on integrating Griddler with your application.
 * And of course, view our own blog post on the subject over at [Giant
   Robots](http://robots.thoughtbot.com/handle-incoming-email-with-griddler).
