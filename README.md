@@ -1,4 +1,4 @@
-Griddler::Sendgrid
+Griddler::Sendgrid [![CircleCI](https://circleci.com/gh/thoughtbot/griddler-sendgrid.svg?style=svg)](https://circleci.com/gh/thoughtbot/griddler-sendgrid)
 ==================
 
 This is an adapter that allows [Griddler](https://github.com/thoughtbot/griddler) to be used with
