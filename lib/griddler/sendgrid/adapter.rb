@@ -36,11 +36,19 @@ module Griddler
         end
       end
 
+      def email_without_name(email_with_possible_name)
+        if email_with_possible_name =~ /<.+>/
+          email_with_possible_name.match(/[^<>]+<(.+)>/)[1]
+        else
+          email_with_possible_name
+        end
+      end
+
       def get_bcc
         if bcc = bcc_from_envelope(params[:envelope])
           remove_addresses_from_bcc(
-            remove_addresses_from_bcc(bcc, params[:to]),
-            params[:cc]
+            remove_addresses_from_bcc(bcc, recipients(:to)),
+            recipients(:cc),
           )
         else
           []
@@ -49,7 +57,7 @@ module Griddler
 
       def remove_addresses_from_bcc(bcc, addresses)
         if addresses.is_a?(Array)
-          bcc -= addresses
+          bcc -= addresses.map { |address| email_without_name(address) }
         elsif addresses && bcc
           bcc.delete(addresses)
         end
