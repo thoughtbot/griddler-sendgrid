@@ -12,6 +12,7 @@ module Griddler
 
       def normalize_params
         params.merge(
+          text: text,
           to: recipients(:to),
           cc: recipients(:cc),
           bcc: get_bcc,
@@ -22,6 +23,23 @@ module Griddler
       private
 
       attr_reader :params
+
+      def text
+        params[:text].presence || extract_text_from_html
+      end
+
+      def extract_text_from_html
+        return "" unless params[:html].present?
+
+        doc = Nokogiri::HTML.parse(params[:html])
+
+        # otherwise styles come out in the text
+        if doc.at_css("style").present?
+          doc.at_css("style").remove
+        end
+
+        doc.text.strip
+      end
 
       def recipients(key)
         raw = ( params[key] || '' )
