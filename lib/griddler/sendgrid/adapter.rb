@@ -12,8 +12,8 @@ module Griddler
 
       def normalize_params
         params.merge(
-          to: recipients(:to),
-          cc: recipients(:cc),
+          to: recipients(:to).map(&:format),
+          cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
         )
@@ -24,48 +24,19 @@ module Griddler
       attr_reader :params
 
       def recipients(key)
-        raw = ( params[key] || '' )
-        if raw.index(">")
-          raw.split(">,").map do |addr|
-            addr.strip!
-            addr << ">" unless addr.index(">")
-            addr
-          end
-        else
-          raw.split(',')
-        end
-      end
-
-      def email_without_name(email_with_possible_name)
-        if email_with_possible_name =~ /<.+>/
-          email_with_possible_name.match(/[^<>]+<(.+)>/)[1]
-        else
-          email_with_possible_name
-        end
+        Mail::AddressList.new(params[key] || '').addresses
       end
 
       def get_bcc
-        if bcc = bcc_from_envelope(params[:envelope])
-          remove_addresses_from_bcc(
-            remove_addresses_from_bcc(bcc, recipients(:to)),
-            recipients(:cc),
-          )
+        if bcc = bcc_from_envelope
+          bcc - recipients(:to).map(&:address) - recipients(:cc).map(&:address)
         else
           []
         end
       end
 
-      def remove_addresses_from_bcc(bcc, addresses)
-        if addresses.is_a?(Array)
-          bcc -= addresses.map { |address| email_without_name(address) }
-        elsif addresses && bcc
-          bcc.delete(addresses)
-        end
-        bcc
-      end
-
-      def bcc_from_envelope(envelope)
-        JSON.parse(envelope)["to"] if envelope.present?
+      def bcc_from_envelope
+        JSON.parse(params[:envelope])["to"] if params[:envelope].present?
       end
 
       def attachment_files
