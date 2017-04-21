@@ -84,7 +84,8 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:to].should eq [
       '"Mr Fugushima at Fugu, Inc" <hi@example.com>',
       'Foo bar <foo@example.com>',
-      'no-name@example.com',
+      '"Eichhörnchen" <squirrel@example.com>',
+      '<no-name@example.com>',
     ]
   end
 
@@ -131,7 +132,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
   def default_params
     {
       text: 'hi',
-      to: '"Mr Fugushima at Fugu, Inc" <hi@example.com>, Foo bar <foo@example.com>, <no-name@example.com>',
+      to: '"Mr Fugushima at Fugu, Inc" <hi@example.com>, Foo bar <foo@example.com>, "Eichhörnchen" <squirrel@example.com>, <no-name@example.com>',
       cc: 'cc@example.com',
       from: 'there@example.com',
       envelope: "{\"to\":[\"johny@example.com\"], \"from\": [\"there@example.com\"]}",
