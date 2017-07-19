@@ -16,6 +16,7 @@ module Griddler
           cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
+          charsets: charsets
         )
       end
 
@@ -39,6 +40,14 @@ module Griddler
       def bcc_from_envelope
         JSON.parse(params[:envelope])["to"] if params[:envelope].present?
       end
+
+      def charsets
+        return {} unless params[:charsets].present?
+        JSON.parse(params[:charsets]).symbolize_keys
+      rescue JSON::ParserError
+        {}
+      end
+
 
       def attachment_files
         attachment_count.times.map do |index|
