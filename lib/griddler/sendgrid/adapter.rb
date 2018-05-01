@@ -16,6 +16,10 @@ module Griddler
           cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
+          spam_report: {
+            report: params[:spam_report],
+            score: params[:spam_score],
+          },
         )
       end
 
