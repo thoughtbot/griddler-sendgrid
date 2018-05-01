@@ -24,8 +24,7 @@ module Griddler
       attr_reader :params
 
       def recipients(key)
-        encoded = Mail::Encodings.address_encode(params[key] || '')
-        Mail::AddressList.new(encoded).addresses
+        Mail::AddressList.new(params[key] || '').addresses
       end
 
       def get_bcc
