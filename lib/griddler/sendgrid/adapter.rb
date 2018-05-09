@@ -16,6 +16,10 @@ module Griddler
           cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
+          spam_report: {
+            report: params[:spam_report],
+            score: params[:spam_score],
+          },
         )
       end
 
@@ -24,8 +28,7 @@ module Griddler
       attr_reader :params
 
       def recipients(key)
-        encoded = Mail::Encodings.address_encode(params[key] || '')
-        Mail::AddressList.new(encoded).addresses
+        Mail::AddressList.new(params[key] || '').addresses
       end
 
       def get_bcc

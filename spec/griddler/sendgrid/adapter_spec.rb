@@ -129,6 +129,15 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:bcc].should eq []
   end
 
+  it 'normalizes the spam report into a griddler friendly format' do
+    normalized_params = normalize_params(default_params)
+
+    normalized_params[:spam_report].should eq({
+      score: '1.234',
+      report: 'Some spam report',
+    })
+  end
+
   def default_params
     {
       text: 'hi',
@@ -136,6 +145,8 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       cc: 'cc@example.com',
       from: 'there@example.com',
       envelope: "{\"to\":[\"johny@example.com\"], \"from\": [\"there@example.com\"]}",
+      spam_score: '1.234',
+      spam_report: 'Some spam report',
     }
   end
 end
