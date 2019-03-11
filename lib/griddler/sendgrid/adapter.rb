@@ -31,6 +31,8 @@ module Griddler
 
       def recipients(key)
         Mail::AddressList.new(params[key] || '').addresses
+      rescue Mail::Field::IncompleteParseError
+        []
       end
 
       def get_bcc

@@ -145,6 +145,12 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalize_params(params)[:charsets].should eq({})
   end
 
+  it 'does not explode if address is not parseable' do
+    params = default_params.merge(cc: '"Closing Bracket Missing For Some Reason" <hi@example.com')
+
+    normalize_params(params)[:cc].should eq([])
+  end
+
   it 'defaults charsets to an empty hash if it is not specified in params' do
     params = default_params.except(:charsets)
     normalize_params(params)[:charsets].should eq({})
