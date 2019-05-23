@@ -16,12 +16,12 @@ module Griddler
           cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
+          attachment_data: attachment_data,
           charsets: charsets,
           spam_report: {
             report: params[:spam_report],
             score: params[:spam_score],
           }
-
         )
       end
 
@@ -54,6 +54,15 @@ module Griddler
         {}
       end
 
+      def attachment_data
+        attachment_count.times.map do |index|
+          {
+            file: extract_file_at(index),
+            type: attachment_info_at(index)['type'],
+            content_id: attachment_info_at(index)['content-id']
+          }
+        end
+      end
 
       def attachment_files
         attachment_count.times.map do |index|
@@ -66,21 +75,20 @@ module Griddler
       end
 
       def extract_file_at(index)
-        filename = attachment_filename(index)
-
-        params.delete("attachment#{index + 1}".to_sym).tap do |file|
+        filename = attachment_info_at(index)['filename']
+        params.fetch("attachment#{index + 1}".to_sym).tap do |file|
           if filename.present?
             file.original_filename = filename
           end
         end
       end
 
-      def attachment_filename(index)
-        attachment_info.fetch("attachment#{index + 1}", {})["filename"]
+      def attachment_info_at(index)
+        attachment_info.fetch("attachment#{index + 1}", {})
       end
 
       def attachment_info
-        @attachment_info ||= JSON.parse(params.delete("attachment-info") || "{}")
+        @attachment_info ||= JSON.parse(params["attachment-info"] || "{}")
       end
     end
   end

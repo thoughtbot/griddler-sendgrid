@@ -27,7 +27,8 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
           "attachment2": {
             "filename": "photo2.jpg",
             "name": "photo2.jpg",
-            "type": "image/jpeg"
+            "type": "image/jpeg",
+            "content-id": "ccce-eeee-aaac"
           },
           "attachment1": {
             "filename": "photo1.jpg",
@@ -40,9 +41,8 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
 
     normalized_params = normalize_params(params)
     normalized_params[:attachments].should eq [upload_1, upload_2]
-    normalized_params.should_not have_key(:attachment1)
-    normalized_params.should_not have_key(:attachment2)
-    normalized_params.should_not have_key(:attachment_info)
+    normalized_params.should have_key(:attachment_data)
+    normalized_params[:attachment_data].should be_present
   end
 
   it "uses sendgrid attachment info for filename" do
