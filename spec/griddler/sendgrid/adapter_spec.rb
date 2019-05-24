@@ -18,58 +18,29 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     }
 
   it 'changes attachments to an array of files' do
-    params = default_params.merge(
-      attachments: '2',
-      attachment1: upload_1,
-      attachment2: upload_2,
-     'attachment-info' => <<-eojson
-        {
-          "attachment2": {
-            "filename": "photo2.jpg",
-            "name": "photo2.jpg",
-            "type": "image/jpeg",
-            "content-id": "ccce-eeee-aaac"
-          },
-          "attachment1": {
-            "filename": "photo1.jpg",
-            "name": "photo1.jpg",
-            "type": "image/jpeg"
-          }
-        }
-      eojson
-    )
-
-    normalized_params = normalize_params(params)
+    normalized_params = normalize_params(attachment_params)
     normalized_params[:attachments].should eq [upload_1, upload_2]
-    normalized_params.should have_key(:attachment_data)
-    normalized_params[:attachment_data].should be_present
   end
 
   it "uses sendgrid attachment info for filename" do
-    params = default_params.merge(
-      attachments: "2",
-      attachment1: upload_1,
-      attachment2: upload_2,
-      "attachment-info" => <<-eojson
-        {
-          "attachment2": {
-            "filename": "sendgrid-filename2.jpg",
-            "name": "photo2.jpg",
-            "type": "image/jpeg"
-          },
-          "attachment1": {
-            "filename": "sendgrid-filename1.jpg",
-            "name": "photo1.jpg",
-            "type": "image/jpeg"
-          }
-        }
-      eojson
-    )
+    attachments = normalize_params(attachment_params)[:attachments]
 
-    attachments = normalize_params(params)[:attachments]
-
-    attachments.first.original_filename.should eq "sendgrid-filename1.jpg"
+    attachments.first.original_filename.should eq "sendgrid-filename1.gif"
     attachments.second.original_filename.should eq "sendgrid-filename2.jpg"
+  end
+
+  it "uses data in sendgrid attachment-info for vendor specific" do
+    normalized_params = normalize_params(attachment_params)
+    normalized_params.should have_key(:vendor_specific)
+    normalized_params[:vendor_specific].should have_key(:attachment_info)
+
+    attachement1_info = normalized_params[:vendor_specific][:attachment_info].find do |at_info|
+      at_info[:content_id] == "8ff183d1-1dbf-46ad-b4d8-b4900a4d108e"
+    end
+
+    attachement1_info.should be_present
+    attachement1_info[:type].should eq "image/gif"
+    attachement1_info[:file].should eq normalized_params[:attachments].first
   end
 
   it 'has no attachments' do
@@ -176,5 +147,32 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       spam_score: '1.234',
       spam_report: 'Some spam report'
     }
+  end
+
+  def attachment_params
+    default_params.merge(
+      attachments: '2',
+      attachment1: upload_1,
+      attachment2: upload_2,
+     'attachment-info' => attachment_info
+    )
+  end
+
+  def attachment_info
+    <<-eojson
+      {
+        "attachment2": {
+          "filename": "sendgrid-filename2.jpg",
+          "name": "photo2.jpg",
+          "type": "image/jpeg"
+        },
+        "attachment1": {
+          "filename": "sendgrid-filename1.gif",
+          "name": "photo1.gif",
+          "type": "image/gif",
+          "content-id": "8ff183d1-1dbf-46ad-b4d8-b4900a4d108e"
+        }
+      }
+    eojson
   end
 end
