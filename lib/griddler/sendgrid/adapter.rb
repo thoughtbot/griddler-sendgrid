@@ -16,7 +16,9 @@ module Griddler
           cc: recipients(:cc).map(&:format),
           bcc: get_bcc,
           attachments: attachment_files,
-          attachment_data: attachment_data,
+          vendor_specific: {
+            attachment_info: processed_attachment_info
+          },
           charsets: charsets,
           spam_report: {
             report: params[:spam_report],
@@ -54,7 +56,7 @@ module Griddler
         {}
       end
 
-      def attachment_data
+      def processed_attachment_info
         attachment_count.times.map do |index|
           {
             file: extract_file_at(index),
