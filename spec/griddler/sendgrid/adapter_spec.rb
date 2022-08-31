@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'spec_helper'
 
 describe Griddler::Sendgrid::Adapter do
@@ -14,6 +16,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       to: 'Hello World <hi@example.com>',
       cc: 'emily@example.com',
       from: 'There <there@example.com>',
+      charsets: { to: 'UTF-8', text: 'iso-8859-1' }.to_json
     }
 
   it 'changes attachments to an array of files' do
@@ -21,7 +24,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       attachments: '2',
       attachment1: upload_1,
       attachment2: upload_2,
-     'attachment-info' => <<-eojson
+      'attachment-info' => <<-EOJSON
         {
           'attachment2': {
             'filename': 'photo2.jpg',
@@ -34,7 +37,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
             'type': 'image/jpeg'
           }
         }
-      eojson
+      EOJSON
     )
 
     normalized_params = normalize_params(params)
@@ -70,12 +73,33 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     normalized_params[:cc].should eq []
   end
 
+  it 'returns the charsets as a hash' do
+    normalized_params = normalize_params(default_params)
+    charsets = normalized_params[:charsets]
+
+    charsets.should be_present
+    charsets[:text].should eq 'iso-8859-1'
+    charsets[:to].should eq 'UTF-8'
+  end
+
+  it 'does not explode if charsets is not JSON-able' do
+    params = default_params.merge(charsets: 'This is not JSON')
+
+    normalize_params(params)[:charsets].should eq({})
+  end
+
+  it 'defaults charsets to an empty hash if it is not specified in params' do
+    params = default_params.except(:charsets)
+    normalize_params(params)[:charsets].should eq({})
+  end
+
   def default_params
     {
       text: 'hi',
       to: 'hi@example.com',
       cc: 'cc@example.com',
       from: 'there@example.com',
+      charsets: { to: 'UTF-8', text: 'iso-8859-1' }.to_json
     }
   end
 end

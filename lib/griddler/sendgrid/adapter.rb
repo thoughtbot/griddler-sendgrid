@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Griddler
   module Sendgrid
     class Adapter
@@ -12,9 +14,10 @@ module Griddler
 
       def normalize_params
         params.merge(
-          to: recipients(:to) + envelope["to"].to_a,
+          to: recipients(:to) + envelope['to'].to_a,
           cc: recipients(:cc),
           attachments: attachment_files,
+          charsets: charsets
         )
       end
 
@@ -27,7 +30,7 @@ module Griddler
       end
 
       def recipients(key)
-        ( params[key] || '' ).split(',')
+        (params[key] || '').split(',')
       end
 
       def attachment_files
@@ -37,6 +40,14 @@ module Griddler
         attachment_count.times.map do |index|
           params.delete("attachment#{index + 1}".to_sym)
         end
+      end
+
+      def charsets
+        return {} unless params[:charsets].present?
+
+        JSON.parse(params[:charsets]).symbolize_keys
+      rescue JSON::ParserError
+        {}
       end
     end
   end
