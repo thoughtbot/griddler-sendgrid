@@ -76,7 +76,13 @@ module Griddler
       end
 
       def attachment_filename(index)
-        attachment_info.fetch("attachment#{index + 1}", {})["filename"]
+        filename = attachment_info.fetch("attachment#{index + 1}", {})["filename"]
+
+        if filename && !filename.valid_encoding?
+          filename.force_encoding('ISO-8859-1').encode('UTF-8')
+        else
+          filename
+        end
       end
 
       def attachment_info
