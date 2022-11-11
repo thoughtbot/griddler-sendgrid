@@ -165,6 +165,33 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     })
   end
 
+  it 'parses sendgrid filename correctly' do
+    params = default_params.merge(
+      attachments: "2",
+      attachment1: upload_1,
+      attachment2: upload_2,
+      "attachment-info" => <<-eojson
+        {
+          "attachment2": {
+            "filename": "\xc3\x28.jpg",
+            "name": "photo2.jpg",
+            "type": "image/jpeg"
+          },
+          "attachment1": {
+            "filename": "sendgrid-filename1.jpg",
+            "name": "photo1.jpg",
+            "type": "image/jpeg"
+          }
+        }
+      eojson
+    )
+
+    attachments = normalize_params(params)[:attachments]
+
+    attachments.first.original_filename.should eq "sendgrid-filename1.jpg"
+    attachments.second.original_filename.should eq "Ã(.jpg"
+  end
+
   def default_params
     {
       text: 'hi',
