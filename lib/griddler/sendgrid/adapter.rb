@@ -20,7 +20,7 @@ module Griddler
           spam_report: {
             report: params[:spam_report],
             score: params[:spam_score],
-          }
+          },
           text: params[:text]&.to_s&.force_encoding(Encoding::UTF_8)
         )
       end
