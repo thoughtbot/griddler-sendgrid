@@ -11,7 +11,25 @@ module Griddler
       end
 
       def normalize_params
-        params.transform_values! { |v| v.is_a?(String) ? to_utf8(v) : v }
+        params.merge!(
+          headers: to_utf8(params[:headers]),
+          dkim: to_utf8(params[:dkim]),
+          "content-ids": to_utf8(params[:"content-ids"]),
+          email: to_utf8(params[:email]),
+          to: to_utf8(params[:to]),
+          html: to_utf8(params[:html]),
+          from: to_utf8(params[:from]),
+          sender_ip: to_utf8(params[:sender_ip]),
+          text: to_utf8(params[:text]),
+          spam_report: to_utf8(params[:spam_report]),
+          envelope: to_utf8(params[:envelope]),
+          attachments: to_utf8(params[:attachments]),
+          subject: to_utf8(params[:subject]),
+          spam_score: to_utf8(params[:spam_score]),
+          "attachment-info": to_utf8(params["attachment-info"]),
+          charsets: to_utf8(params[:charsets]),
+          spf: to_utf8(params[:spf])
+        )
 
         params.merge(
           to: recipients(:to).map(&:format),
@@ -86,11 +104,11 @@ module Griddler
       end
 
       def to_utf8(str)
-        str = str.force_encoding(Encoding::UTF_8)
-        return str if str.valid_encoding?
+        str = str&.force_encoding(Encoding::UTF_8)
+        return str if str&.valid_encoding?
 
-        str = str.force_encoding(Encoding::ISO_8859_1)
-        str.encode(Encoding::UTF_8, :invalid => :replace, :undef => :replace)
+        str = str&.force_encoding(Encoding::ISO_8859_1)
+        str&.encode(Encoding::UTF_8, :invalid => :replace, :undef => :replace)
       end
     end
   end
