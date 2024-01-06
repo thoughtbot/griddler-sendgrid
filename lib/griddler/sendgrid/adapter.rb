@@ -78,7 +78,7 @@ module Griddler
       end
 
       def attachment_filename(index)
-        filename = attachment_info.fetch("attachment#{index + 1}", {})["filename"]
+        attachment_info.fetch("attachment#{index + 1}", {})["filename"]
       end
 
       def attachment_info
