@@ -11,6 +11,8 @@ module Griddler
       end
 
       def normalize_params
+        params.transform_values! { |v| v.is_a?(String) ? to_utf8(v) : v }
+
         params.merge(
           to: recipients(:to).map(&:format),
           cc: recipients(:cc).map(&:format),
@@ -20,8 +22,7 @@ module Griddler
           spam_report: {
             report: params[:spam_report],
             score: params[:spam_score],
-          },
-          text: params[:text]&.to_s&.force_encoding(Encoding::UTF_8)
+          }
         )
       end
 
@@ -49,7 +50,8 @@ module Griddler
 
       def charsets
         return {} unless params[:charsets].present?
-        JSON.parse(params[:charsets]).symbolize_keys
+        charsets = JSON.parse(params[:charsets]).symbolize_keys
+        charsets.transform_values!{ "UTF-8" }
       rescue JSON::ParserError
         {}
       end
@@ -77,16 +79,18 @@ module Griddler
 
       def attachment_filename(index)
         filename = attachment_info.fetch("attachment#{index + 1}", {})["filename"]
-
-        if filename && !filename.valid_encoding?
-          filename.force_encoding('ISO-8859-1').encode('UTF-8')
-        else
-          filename
-        end
       end
 
       def attachment_info
         @attachment_info ||= JSON.parse(params.delete("attachment-info") || "{}")
+      end
+
+      def to_utf8(str)
+        str = str.force_encoding(Encoding::UTF_8)
+        return str if str.valid_encoding?
+
+        str = str.force_encoding(Encoding::ISO_8859_1)
+        str.encode(Encoding::UTF_8, :invalid => :replace, :undef => :replace)
       end
     end
   end
