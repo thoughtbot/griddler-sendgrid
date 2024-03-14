@@ -37,11 +37,6 @@ Credits
 Griddler::Sendgrid was extracted from Griddler.
 
 Griddler was written by Caleb Thompson and Joel Oliveira.
-
-![thoughtbot](http://thoughtbot.com/images/tm/logo.png)
-
-The names and logos for thoughtbot are trademarks of thoughtbot, inc.
-
 License
 -------
 
@@ -52,3 +47,6 @@ file.
 Griddler::Sendgrid is Copyright © 2014 Caleb Thompson and thoughtbot. It is free
 software, and may be redistributed under the terms specified in the LICENSE
 file.
+
+<!-- START /templates/footer.md -->
+<!-- END /templates/footer.md -->
