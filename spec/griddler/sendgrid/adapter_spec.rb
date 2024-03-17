@@ -135,7 +135,7 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
     charsets = normalized_params[:charsets]
 
     charsets.should be_present
-    charsets[:text].should eq 'iso-8859-1'
+    charsets[:text].should eq 'UTF-8'
     charsets[:to].should eq 'UTF-8'
   end
 
@@ -163,6 +163,71 @@ describe Griddler::Sendgrid::Adapter, '.normalize_params' do
       score: '1.234',
       report: 'Some spam report',
     })
+  end
+
+  it 'parses sendgrid filename correctly' do
+    params = default_params.merge(
+      attachments: "2",
+      attachment1: upload_1,
+      attachment2: upload_2,
+      "attachment-info" => <<-eojson
+        {
+          "attachment2": {
+            "filename": "\xc3\x28.jpg",
+            "name": "photo2.jpg",
+            "type": "image/jpeg"
+          },
+          "attachment1": {
+            "filename": "sendgrid-filename1.jpg",
+            "name": "photo1.jpg",
+            "type": "image/jpeg"
+          }
+        }
+      eojson
+    )
+
+    attachments = normalize_params(params)[:attachments]
+
+    attachments.first.original_filename.should eq "sendgrid-filename1.jpg"
+    attachments.second.original_filename.should eq "Ã(.jpg"
+  end
+
+  it 'parses envelope correctly' do
+    params = default_params.merge(
+      envelope: "{\"to\":[\"\xc3\x28 <johny@example.com>\"], \"from\": [\"there@example.com\"]}",
+    )
+
+    normalize_params(params)[:bcc].should eq ["Ã( <johny@example.com>"]
+  end
+
+  it 'converts subject to utf-8' do
+    params = default_params.merge(
+      subject: "\xc3\x28".force_encoding(Encoding::ISO_8859_1)
+    )
+
+    subject = normalize_params(params)[:subject]
+    subject.encoding.should eq Encoding::UTF_8
+    subject.should eq "Ã("
+  end
+
+  it 'converts html to utf-8' do
+    params = default_params.merge(
+      html: "\xc3\x28<p>text</p>".force_encoding(Encoding::ISO_8859_1)
+    )
+
+    html = normalize_params(params)[:html]
+    html.encoding.should eq Encoding::UTF_8
+    html.should eq "Ã(<p>text</p>"
+  end
+
+  it 'converts text to utf-8' do
+    params = default_params.merge(
+      text: "\xc3\x28".force_encoding(Encoding::ISO_8859_1)
+    )
+
+    text = normalize_params(params)[:text]
+    text.encoding.should eq Encoding::UTF_8
+    text.should eq "Ã("
   end
 
   def default_params
