@@ -1,3 +1,7 @@
+## Deprecated as of September 19, 2024
+
+Griddler, and its related libraries, have been deprecated in favor of [ActionMailbox](https://guides.rubyonrails.org/action_mailbox_basics.html) since this is built into Rails now.
+
 Griddler::Sendgrid
 ==================
 
